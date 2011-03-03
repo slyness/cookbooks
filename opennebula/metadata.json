@@ -1,0 +1,35 @@
+{
+  "recipes": {
+  },
+  "providing": {
+  },
+  "maintainer": "Heavy Water Software Inc.",
+  "description": "Installs/Configures opennebula",
+  "replacing": {
+  },
+  "maintainer_email": "ops@heavywater.ca",
+  "groupings": {
+  },
+  "attributes": {
+  },
+  "recommendations": {
+  },
+  "dependencies": {
+    "openssl": [
+
+    ]
+  },
+  "suggestions": {
+  },
+  "platforms": {
+    "ubuntu": [
+
+    ]
+  },
+  "version": "0.0.1",
+  "license": "Apache 2.0",
+  "long_description": "= DESCRIPTION:\nInstalls and configures Opennebula http://www.opennebula.org\n= REQUIREMENTS:\nUbuntu\nData Bag for oneadmin should exist: knife data bag create oneadmin \n= ATTRIBUTES:\n\n= USAGE:\nTwo Roles in this cookbook are recipe[opennebula-admin] and recipe[opennebula-node]\n\nrecipe[opennebula-admin] will install and configure an Opennebula as a Virtual Infrastructure Manager\n\nrecipe[opennebula-admin] will install and configure Opennebula as a Cluster Node\n",
+  "name": "opennebula",
+  "conflicting": {
+  }
+}

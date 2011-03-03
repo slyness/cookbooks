@@ -1,0 +1,35 @@
+= DESCRIPTION:
+
+Installs and configures Opennebula http://www.opennebula.org
+
+Opennebula cookbook sponsored by Heavy Water Software Inc. http://heavywater.ca
+and written by Slyness Technologies http://www.slyness.org
+
+= REQUIREMENTS:
+
+Ubuntu 11.04 Natty
+
+Chef Server or Opscode Platform
+
+Data Bag for oneadmin should exist: knife data bag create oneadmin 
+
+= ATTRIBUTES:
+
+* opennebula[:clustername] = "default"
+
+* opennebula[:admin][:uri] = "http://example.com/your_ubuntu_10.04.1-server-image.qcow2"
+
+* opennebula[:admin][:checksum] ="5ca1ab1e"
+
+* opennebula[:admin][:osimage] = "ubuntu-10.04.1-server"
+
+* opennebula[:admin][:onevnet] = "vnet01"
+
+= USAGE:
+
+Two Roles in this cookbook are recipe[opennebula::admin] and recipe[opennebula::node]
+
+recipe[opennebula::admin] will install and configure an Opennebula as a Virtual Infrastructure Manager
+
+recipe[opennebula::node] will install and configure Opennebula as a Cluster Node
+

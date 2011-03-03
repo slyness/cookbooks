@@ -1,0 +1,15 @@
+NAME	= gerbil 
+CPU	= 1
+MEMORY	= 512
+
+DISK 	= [ IMAGE = "Ubuntu 10.04" ] 
+NIC	= [ NETWORK = "vnet01" ] 
+OS	= [ ARCH = "x86_64" ]
+CONTEXT	= [
+	hostname = "gerbil"
+]
+GRAPHICS = [
+	TYPE = "vnc",
+	LISTEN = "0.0.0.0",
+	PORT = "5901"
+]	
