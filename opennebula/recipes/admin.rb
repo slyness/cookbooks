@@ -1,8 +1,10 @@
-package "qemu-kvm"
-package "libvirt-bin"
-package "ubuntu-vm-builder"
-package "bridge-utils"
 package "opennebula"
+package "opennebula-common"
+gem_package "xmlparser"
+gem_package "nokogiri"
+gem_package "json"
+gem_package "sinatra"
+gem_package "thin"
 
 ruby_block "save public key" do
   block do
@@ -60,10 +62,55 @@ service "opennebula" do
   action [ :enable, :start ]
 end
 
-execute "adding ONEHOST entry for #{node.fqdn}" do
-  command "sudo -u oneadmin onehost create #{node.fqdn} im_kvm vmm_kvm tm_ssh"
-  not_if "sudo -u oneadmin onehost list | grep #{node.fqdn}"
+#custom upgrade to 2.2 requires packages built from OpenNebula 2.2
+#source. comment out if you do not wish to customize upgrade.
+
+directory "/tmp/upgrade" do
+  owner "oneadmin"
+  group "cloud"
+  mode "0755"
+  action :create
 end
+
+remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_1}" do
+  source node.opennebula.dpkg.uri_1
+  owner "oneadmin"
+  mode "0644"
+  not_if do
+    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_1}")
+  end
+end
+
+remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_2}" do
+  source node.opennebula.dpkg.uri_2
+  owner "oneadmin"
+  mode "0644"
+  not_if do
+    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_2}")
+  end
+end
+
+remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_3}" do
+  source node.opennebula.dpkg.uri_3
+  owner "oneadmin"
+  mode "0644"
+  not_if do
+    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_3}")
+  end
+end
+
+execute "performing OpenNebula UPGRADE to 2.2" do
+  command "sudo dpkg -i /tmp/upgrade/#{node.opennebula.dpkg.dpkg_1} /tmp/upgrade/#{node.opennebula.dpkg.dpkg_2} /tmp/upgrade/#{node.opennebula.dpkg.dpkg_3}"
+  notifies :restart, resources(:service => "opennebula")
+  not_if "oned -v | grep distributed | grep 2.2"
+end
+
+#end custom upgrade
+
+#execute "adding ONEHOST entry for #{node.fqdn}" do
+#  command "sudo -u oneadmin onehost create #{node.fqdn} im_kvm vmm_kvm tm_ssh"
+#  not_if "sudo -u oneadmin onehost list | grep #{node.fqdn}"
+#end
 
 search(:node, 'role:opennebula-node').each do |server|
   execute "adding ONEHOST entry for #{server.fqdn}" do
