@@ -46,16 +46,6 @@ template "/var/lib/one/.one/one_auth" do
   not_if "grep oneadmin:oneadmin /var/lib/one/.one/one_auth"
 end
 
-group "libvirtd" do
-  gid 119
-  members ['oneadmin']
-end
-
-group "kvm" do
-  gid 118
-  members ['oneadmin']
-end
-
 service "opennebula" do
   pattern "oned"
   supports :restart => true, :reload => true
@@ -72,45 +62,40 @@ directory "/tmp/upgrade" do
   action :create
 end
 
-remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_1}" do
-  source node.opennebula.dpkg.uri_1
+remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula}" do
+  source node.opennebula.dpkg.uri_opennebula
   owner "oneadmin"
   mode "0644"
   not_if do
-    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_1}")
+    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula}")
   end
 end
 
-remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_2}" do
-  source node.opennebula.dpkg.uri_2
+remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_common}" do
+  source node.opennebula.dpkg.uri_opennebula_common
   owner "oneadmin"
   mode "0644"
   not_if do
-    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_2}")
+    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_common}")
   end
 end
 
-remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_3}" do
-  source node.opennebula.dpkg.uri_3
+remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_libopennebula_java}" do
+  source node.opennebula.dpkg.uri_libopennebula_java
   owner "oneadmin"
   mode "0644"
   not_if do
-    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_3}")
+    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_libopennebula_java}")
   end
 end
 
 execute "performing OpenNebula UPGRADE to 2.2" do
-  command "sudo dpkg -i /tmp/upgrade/#{node.opennebula.dpkg.dpkg_1} /tmp/upgrade/#{node.opennebula.dpkg.dpkg_2} /tmp/upgrade/#{node.opennebula.dpkg.dpkg_3}"
+  command "sudo dpkg -i /tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula} /tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_common} /tmp/upgrade/#{node.opennebula.dpkg.dpkg_libopennebula_java}"
   notifies :restart, resources(:service => "opennebula")
-  not_if "oned -v | grep distributed | grep 2.2"
+  not_if "oned -v | grep -i opennebula | grep distributed | grep 2.2"
 end
 
 #end custom upgrade
-
-#execute "adding ONEHOST entry for #{node.fqdn}" do
-#  command "sudo -u oneadmin onehost create #{node.fqdn} im_kvm vmm_kvm tm_ssh"
-#  not_if "sudo -u oneadmin onehost list | grep #{node.fqdn}"
-#end
 
 search(:node, 'role:opennebula-node').each do |server|
   execute "adding ONEHOST entry for #{server.fqdn}" do

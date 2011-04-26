@@ -15,26 +15,26 @@ directory "/tmp/upgrade" do
   action :create
 end
 
-remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_2}" do
-  source node.opennebula.dpkg.uri_2
+remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_common}" do
+  source node.opennebula.dpkg.uri_opennebula_common
   owner "oneadmin"
   mode "0644"
   not_if do
-    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_2}")
+    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_common}")
   end
 end
 
-remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_4}" do
-  source node.opennebula.dpkg.uri_4
+remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_node}" do
+  source node.opennebula.dpkg.uri_opennebula_node
   owner "oneadmin"
   mode "0644"
   not_if do
-    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_4}")
+    File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_node}")
   end
 end
 
 execute "performing OpenNebula UPGRADE to 2.2" do
-  command "sudo dpkg -i /tmp/upgrade/#{node.opennebula.dpkg.dpkg_2} /tmp/upgrade/#{node.opennebula.dpkg.dpkg_4}"
+  command "sudo dpkg -i /tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_common} /tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_node}"
   not_if "dpkg -l | grep opennebula | grep ii | grep 2.2"
 end
 
@@ -60,6 +60,3 @@ group "kvm" do
   gid 118
   members ['oneadmin']
 end
-
-
-
