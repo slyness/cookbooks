@@ -25,6 +25,22 @@ Data Bag for oneadmin should exist: knife data bag create oneadmin
 
 * opennebula[:admin][:onevnet] = "vnet01"
 
+* opennebula[:dpkg][:uri_opennebula] = "https://example.com/opennebula_2.2-1_amd64.deb"
+
+* opennebula[:dpkg][:uri_opennebula_common] = "https://example.com/opennebula-common_2.2-1_all.deb"
+
+* opennebula[:dpkg][:uri_libopennebula_java] = "https://example.com/libopennebula-java_2.2-1_all.deb"
+
+* opennebula[:dpkg][:uri_opennebula_node] = "https://example.com/opennebula-node_2.2-1_all.deb"
+
+* opennebula[:dpkg][:dpkg_opennebula] = "opennebula_2.2-1_amd64.deb"
+
+* opennebula[:dpkg][:dpkg_opennebula_common] = "opennebula-common_2.2-1_all.deb"
+
+* opennebula[:dpkg][:dpkg_libopennebula_java] = "libopennebula-java_2.2-1_all.deb"
+
+* opennebula[:dpkg][:dpkg_opennebula_node] = "opennebula-node_2.2-1_all.deb"
+
 = USAGE:
 
 Two Roles in this cookbook are recipe[opennebula::admin] and recipe[opennebula::node]
