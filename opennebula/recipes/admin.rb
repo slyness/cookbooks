@@ -1,10 +1,14 @@
 package "opennebula"
 package "opennebula-common"
-gem_package "xmlparser"
-gem_package "nokogiri"
-gem_package "json"
-gem_package "sinatra"
-gem_package "thin"
+package "libxml2"
+package "libxml2-dev"
+package "libxslt1.1"
+package "libxslt1-dev"
+package "libxml-parser-ruby"
+package "libjson-ruby"
+package "libnokogiri-ruby"
+package "libsinatra-ruby"
+package "thin1.8"
 
 ruby_block "save public key" do
   block do
@@ -56,15 +60,12 @@ end
 #source. comment out if you do not wish to customize upgrade.
 
 directory "/tmp/upgrade" do
-  owner "oneadmin"
-  group "cloud"
   mode "0755"
   action :create
 end
 
 remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula}" do
   source node.opennebula.dpkg.uri_opennebula
-  owner "oneadmin"
   mode "0644"
   not_if do
     File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula}")
@@ -74,7 +75,6 @@ end
 remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_common}" do
   source node.opennebula.dpkg.uri_opennebula_common
   owner "oneadmin"
-  mode "0644"
   not_if do
     File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_opennebula_common}")
   end
@@ -82,7 +82,6 @@ end
 
 remote_file "/tmp/upgrade/#{node.opennebula.dpkg.dpkg_libopennebula_java}" do
   source node.opennebula.dpkg.uri_libopennebula_java
-  owner "oneadmin"
   mode "0644"
   not_if do
     File.exists?("/tmp/upgrade/#{node.opennebula.dpkg.dpkg_libopennebula_java}")
@@ -95,12 +94,19 @@ execute "performing OpenNebula UPGRADE to 2.2" do
   not_if "oned -v | grep -i opennebula | grep distributed | grep 2.2"
 end
 
+execute "install sinatra gem" do
+  command "sudo gem install sinatra"
+  not_if do
+    File.exists?("/usr/bin/rackup")
+  end
+end
+
 #end custom upgrade
 
 search(:node, 'role:opennebula-node').each do |server|
   execute "adding ONEHOST entry for #{server.fqdn}" do
-    command "sudo -u oneadmin onehost create #{server.fqdn} im_kvm vmm_kvm tm_ssh"
-    not_if "sudo -u oneadmin onehost list | grep #{server.fqdn}"
+    command "sudo -i -u oneadmin onehost create #{server.fqdn} im_kvm vmm_kvm tm_ssh"
+    not_if "sudo -i -u oneadmin onehost list | grep #{server.fqdn}"
   end
 end
 
@@ -132,8 +138,8 @@ template "/var/lib/one/templates/#{node.opennebula.admin.osimage}.template" do
 end
 
 execute "registering ONEIMAGE osimage #{node.opennebula.admin.osimage}" do
-  command "sudo -u oneadmin oneimage create /var/lib/one/templates/#{node.opennebula.admin.osimage}.template"
-  not_if "sudo -u oneadmin oneimage list | grep 10.04"
+  command "sudo -i -u oneadmin oneimage create /var/lib/one/templates/#{node.opennebula.admin.osimage}.template"
+  not_if "sudo -i -u oneadmin oneimage list | grep 10.04"
 end
 
 template "/var/lib/one/templates/#{node.opennebula.admin.onevnet}.template" do
@@ -147,8 +153,8 @@ template "/var/lib/one/templates/#{node.opennebula.admin.onevnet}.template" do
 end
 
 execute "registering ONEVNET #{node.opennebula.admin.onevnet} to opennebula" do
-  command "sudo -u oneadmin onevnet create /var/lib/one/templates/#{node.opennebula.admin.onevnet}.template"
-  not_if "sudo -u oneadmin onevnet list | grep #{node.opennebula.admin.onevnet}"
+  command "sudo -i -u oneadmin onevnet create /var/lib/one/templates/#{node.opennebula.admin.onevnet}.template"
+  not_if "sudo -i -u oneadmin onevnet list | grep #{node.opennebula.admin.onevnet}"
 end
 
 template "/var/lib/one/templates/machine01.template" do
