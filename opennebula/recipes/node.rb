@@ -40,10 +40,23 @@ end
 
 #end custom upgrade
 
+template "/var/lib/one/.ssh/config" do
+  source "ssh_config.erb"
+  owner "oneadmin"
+  group "cloud"
+  mode "644"
+  not_if do
+    File.exists?("/var/lib/one/.ssh/config")
+  end
+end
+
 file "/var/lib/one/.ssh/authorized_keys" do
   content data_bag_item( "oneadmin", "public_key" )["content"]
   owner "oneadmin"
   mode "600"
+  not_if do
+    File.exists?("/var/lib/one/.ssh/authorized_keys")
+  end
 end
 
 execute "adding public key to authorized_keys" do
@@ -52,11 +65,13 @@ execute "adding public key to authorized_keys" do
 end
 
 group "libvirtd" do
-  gid 119
+  group_name "libvirtd"
+  append true
   members ['oneadmin']
 end
 
 group "kvm" do
-  gid 118
+  group_name "kvm"
+  append true
   members ['oneadmin']
 end
