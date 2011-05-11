@@ -47,7 +47,9 @@ template "/var/lib/one/.one/one_auth" do
   group "cloud"
   mode "644"
   variables :password => "oneadmin"
-  not_if "grep oneadmin:oneadmin /var/lib/one/.one/one_auth"
+  not_if do
+    File.exists?("/var/lib/one/.one/one_auth")
+  end
 end
 
 service "opennebula" do
@@ -110,11 +112,29 @@ search(:node, 'role:opennebula-node').each do |server|
   end
 end
 
+directory "/var/lib/one/context" do
+  owner "oneadmin"
+  group "cloud"
+  mode "0755"
+  action :create
+end
+
+
 directory "/var/lib/one/templates" do
   owner "oneadmin"
   group "cloud"
   mode "0755"
   action :create
+end
+
+template "/var/lib/one/context/init.sh" do
+  source "context-init.erb"
+  owner "oneadmin"
+  group "cloud"
+  mode "644"
+  not_if do
+    File.exists?("/var/lib/one/context/init.sh")
+  end
 end
 
 remote_file "/var/lib/one/images/#{node.opennebula.admin.osimage}.qcow2" do
