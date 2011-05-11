@@ -1,0 +1,15 @@
+#!/bin/bash
+ 
+if [ -f /mnt/context.sh ] 
+then
+. /mnt/context.sh
+fi
+
+if [ -f /mnt/admin_keys ]
+then
+cat /mnt/admin_keys >> /home/$USERNAME/.ssh/authorized_keys
+fi
+
+echo $HOST > /etc/hostname;
+hostname $FQD;
+sed -i "/127.0.1.1/s/ubuntu/$FQD $HOST/" /etc/hosts;
