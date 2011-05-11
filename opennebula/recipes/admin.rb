@@ -108,7 +108,7 @@ end
 search(:node, 'role:opennebula-node').each do |server|
   execute "adding ONEHOST entry for #{server.fqdn}" do
     command "sudo -i -u oneadmin onehost create #{server.fqdn} im_kvm vmm_kvm tm_ssh"
-    not_if "sudo -i -u oneadmin onehost list | grep #{server.fqdn}"
+    not_if "sudo -i -u oneadmin onehost list | grep #{server.hostname}"
   end
 end
 
