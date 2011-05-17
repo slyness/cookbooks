@@ -9,6 +9,8 @@ package "libjson-ruby"
 package "libnokogiri-ruby"
 package "libsinatra-ruby"
 package "thin1.8"
+package "libamazonec2-ruby"
+package "libuuidtools-ruby"
 
 ruby_block "save public key" do
   block do
